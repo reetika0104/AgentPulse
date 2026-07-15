@@ -99,6 +99,16 @@ class PulseAPI {
     return this.request('/status');
   }
 
+  // Metrics
+  async getMetrics() {
+    return this.request('/agent/metrics');
+  }
+
+  // Agent phases
+  async getPhases() {
+    return this.request('/agent/phases');
+  }
+
   // Config
   async getConfig() {
     return this.request('/config');

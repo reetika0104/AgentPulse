@@ -1,129 +1,216 @@
-# PULSE Deployment Guide
+# PULSE — Complete AWS Deployment Guide
 
-## Complete AWS Deployment
+## Architecture Overview
 
-### Step 1: Prerequisites
+PULSE uses 12+ AWS services in a production architecture:
 
-```bash
-# Verify AWS CLI
-aws sts get-caller-identity
+```
+EventBridge Scheduler (7 AM daily)
+  └─▶ AWS Lambda (trigger)
+        └─▶ App Runner (FastAPI backend)
+              ├─▶ Secrets Manager (credentials)
+              ├─▶ Amazon Bedrock Nova (AI generation)
+              ├─▶ Amazon SES (email delivery)
+              ├─▶ CloudWatch (metrics + logs)
+              └─▶ S3 (brief archive)
 
-# Verify Docker
-docker --version
-
-# Verify Node.js
-node --version
-npm --version
+CloudFront CDN ──▶ S3 (React frontend)
+Route 53 ──▶ CloudFront
 ```
 
-### Step 2: Deploy Infrastructure (CloudFormation)
+---
+
+## Prerequisites
+
+```bash
+# Verify AWS CLI v2
+aws --version
+aws sts get-caller-identity
+
+# Verify tools
+python --version    # 3.12+
+node --version      # 18+
+docker --version    # For App Runner deployment
+```
+
+---
+
+## Step 1: Deploy Infrastructure (CloudFormation)
 
 ```bash
 cd infrastructure/scripts
 chmod +x *.sh
 
-# Deploy the full CloudFormation stack
+# Deploy the complete stack
 ./deploy.sh production
 ```
 
-This creates:
-- Lambda function
-- EventBridge Scheduler (daily at 7 AM)
-- S3 bucket for brief storage
-- IAM roles and policies
-- CloudWatch dashboard and alarms
-- Secrets Manager secrets
-- SES configuration set
+**What this creates:**
+- ✅ Lambda function (`pulse-morning-brief-production`)
+- ✅ EventBridge Scheduler (daily at 7:00 AM Eastern)
+- ✅ S3 bucket for brief storage
+- ✅ IAM roles with least-privilege policies
+- ✅ CloudWatch dashboard + alarms
+- ✅ Secrets Manager secret (`pulse/api-keys`)
+- ✅ SES configuration set
 
-### Step 3: Configure Secrets
+---
+
+## Step 2: Configure Secrets
 
 ```bash
 aws secretsmanager update-secret \
     --secret-id pulse/api-keys \
     --secret-string '{
-        "github_token": "ghp_your_token",
-        "weather_api_key": "your_openweather_key",
-        "telegram_bot_token": "your_bot_token",
+        "github_token": "ghp_your_token_here",
+        "weather_api_key": "your_openweathermap_key",
+        "telegram_bot_token": "123456:ABC-DEF",
         "telegram_chat_id": "your_chat_id",
-        "slack_webhook_url": "https://hooks.slack.com/...",
-        "notion_api_key": "secret_..."
-    }'
+        "slack_webhook_url": "https://hooks.slack.com/services/T.../B.../xxx",
+        "notion_api_key": "secret_xxx"
+    }' \
+    --region us-east-1
 ```
 
-### Step 4: Configure SES
+---
+
+## Step 3: Configure Amazon SES
 
 ```bash
-./setup-ses.sh sender@yourdomain.com recipient@yourdomain.com
+# Verify sender email
+aws ses verify-email-identity \
+    --email-address pulse@yourdomain.com \
+    --region us-east-1
+
+# Verify recipient (required in sandbox)
+aws ses verify-email-identity \
+    --email-address you@yourdomain.com \
+    --region us-east-1
 ```
 
-### Step 5: Deploy Backend (App Runner)
+> **Note:** In SES sandbox mode, both sender and recipient must be verified.
+> To exit sandbox: [Request production access](https://docs.aws.amazon.com/ses/latest/dg/request-production-access.html)
+
+---
+
+## Step 4: Deploy Backend (App Runner)
 
 ```bash
 ./deploy-apprunner.sh production
 ```
 
-### Step 6: Deploy Frontend (S3 + CloudFront)
+**What this does:**
+1. Creates ECR repository
+2. Builds Docker image
+3. Pushes to ECR
+4. Creates/updates App Runner service
+5. Configures health checks on `/api/v1/health`
+
+---
+
+## Step 5: Update Lambda with Backend URL
+
+```bash
+# Get the App Runner service URL
+APP_URL=$(aws apprunner list-services \
+    --query "ServiceSummaryList[?ServiceName=='pulse-backend-production'].ServiceUrl" \
+    --output text --region us-east-1)
+
+# Update Lambda environment variable
+aws lambda update-function-configuration \
+    --function-name pulse-morning-brief-production \
+    --environment "Variables={
+        PULSE_API_URL=https://${APP_URL},
+        PULSE_API_KEY=pulse2026,
+        AWS_REGION_NAME=us-east-1,
+        BEDROCK_MODEL_ID=amazon.nova-micro-v1:0
+    }" \
+    --region us-east-1
+```
+
+---
+
+## Step 6: Deploy Frontend (CloudFront + S3)
 
 ```bash
 ./deploy-frontend.sh production
 ```
 
-### Step 7: Update Lambda with Backend URL
+**What this does:**
+1. Builds the React app (`npm run build`)
+2. Creates S3 bucket with website hosting
+3. Uploads with correct cache headers
+4. Creates CloudFront distribution with HTTPS
+5. Configures SPA routing (404 → index.html)
+
+---
+
+## Step 7: Route 53 (Optional)
 
 ```bash
-# Get App Runner URL
-APP_RUNNER_URL=$(aws apprunner list-services \
-    --query "ServiceSummaryList[?ServiceName=='pulse-backend-production'].ServiceUrl" \
-    --output text)
+# Create hosted zone
+aws route53 create-hosted-zone \
+    --name pulse.yourdomain.com \
+    --caller-reference $(date +%s)
 
-# Update Lambda environment
-aws lambda update-function-configuration \
-    --function-name pulse-morning-brief-production \
-    --environment "Variables={PULSE_API_URL=https://${APP_RUNNER_URL},PULSE_API_KEY=pulse2026}"
+# Point to CloudFront (create CNAME or A-Alias record)
 ```
 
-### Step 8: Verify
+---
+
+## Step 8: Verify Everything
 
 ```bash
 # Test Lambda manually
 aws lambda invoke \
     --function-name pulse-morning-brief-production \
-    --payload '{"source": "manual-test"}' \
-    /tmp/pulse-response.json
+    --payload '{"source": "aws.scheduler", "detail-type": "Scheduled Event"}' \
+    /tmp/pulse-output.json --region us-east-1
 
-cat /tmp/pulse-response.json
+cat /tmp/pulse-output.json
 
 # Check CloudWatch logs
-aws logs tail /aws/lambda/pulse-morning-brief-production --follow
+aws logs tail /aws/lambda/pulse-morning-brief-production --follow --region us-east-1
+
+# Check CloudWatch metrics
+aws cloudwatch list-metrics --namespace "PULSE/Agent" --region us-east-1
+
+# Verify App Runner health
+curl https://<your-app-runner-url>/api/v1/health
 ```
 
 ---
 
-## Route 53 (Optional)
+## Monitoring & Alerts
 
 ```bash
-# Create hosted zone
-aws route53 create-hosted-zone --name pulse.yourdomain.com --caller-reference $(date +%s)
+# View the PULSE CloudWatch dashboard
+# Console: CloudWatch → Dashboards → PULSE-Agent-production
 
-# Point to CloudFront distribution
-# Add CNAME record pointing to your CloudFront domain
+# Check alarm status
+aws cloudwatch describe-alarms \
+    --alarm-name-prefix "PULSE" \
+    --region us-east-1
 ```
 
 ---
 
-## Monitoring
+## Troubleshooting
 
-```bash
-# View CloudWatch dashboard
-# Console: CloudWatch > Dashboards > PULSE-Agent-production
+| Issue | Solution |
+|-------|----------|
+| Lambda timeout | Increase to 300s, check App Runner URL |
+| SES bounce | Verify email addresses, check sandbox status |
+| Bedrock access | Enable model access in Bedrock console |
+| App Runner 502 | Check Docker build, verify health endpoint |
+| EventBridge not firing | Verify schedule timezone, check state is ENABLED |
 
-# View execution metrics
-aws cloudwatch get-metric-statistics \
-    --namespace "PULSE/Agent" \
-    --metric-name "ExecutionCount" \
-    --dimensions Name=AgentName,Value=PULSE Name=Status,Value=success \
-    --start-time $(date -d '7 days ago' --iso-8601=seconds) \
-    --end-time $(date --iso-8601=seconds) \
-    --period 86400 \
-    --statistics Sum
-```
+---
+
+## Cost Optimization
+
+- Use `amazon.nova-micro-v1:0` (cheapest Bedrock model)
+- Lambda at 512MB is sufficient
+- App Runner pauses when idle (pay per request)
+- S3 lifecycle moves briefs to Glacier at 90 days
+- CloudWatch retains logs for 30 days only

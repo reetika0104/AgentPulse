@@ -163,8 +163,9 @@ def _invoke_directly(execution_id: str) -> dict:
 
 
 def _publish_metrics(execution_id: str, status: str, duration: float) -> None:
-    """Publish custom CloudWatch metrics."""
+    """Publish custom CloudWatch metrics to PULSE/Agent namespace."""
     try:
+        timestamp = datetime.now(timezone.utc)
         cloudwatch.put_metric_data(
             Namespace="PULSE/Agent",
             MetricData=[
@@ -172,6 +173,7 @@ def _publish_metrics(execution_id: str, status: str, duration: float) -> None:
                     "MetricName": "ExecutionDuration",
                     "Value": duration,
                     "Unit": "Seconds",
+                    "Timestamp": timestamp,
                     "Dimensions": [
                         {"Name": "AgentName", "Value": "PULSE"},
                         {"Name": "Status", "Value": status},
@@ -181,12 +183,28 @@ def _publish_metrics(execution_id: str, status: str, duration: float) -> None:
                     "MetricName": "ExecutionCount",
                     "Value": 1,
                     "Unit": "Count",
+                    "Timestamp": timestamp,
                     "Dimensions": [
                         {"Name": "AgentName", "Value": "PULSE"},
                         {"Name": "Status", "Value": status},
                     ],
                 },
+                {
+                    "MetricName": "AgentInvocations",
+                    "Value": 1,
+                    "Unit": "Count",
+                    "Timestamp": timestamp,
+                    "Dimensions": [
+                        {"Name": "AgentName", "Value": "PULSE"},
+                        {"Name": "TriggerSource", "Value": "EventBridge"},
+                    ],
+                },
             ],
         )
+        print(json.dumps({
+            "message": "CloudWatch metrics published",
+            "namespace": "PULSE/Agent",
+            "metrics_count": 3,
+        }))
     except Exception as e:
         print(f"Failed to publish metrics: {e}")

@@ -1,84 +1,126 @@
-# ⚡ PULSE — AI Digital Chief of Staff
+# ⚡ PULSE — Personal Unified Life & Productivity Executive
 
-> An always-on AI agent that runs autonomously every morning, collects intelligence from multiple sources, generates a personalized daily brief using Amazon Bedrock (Nova), and delivers it through email, Telegram, and Slack — with zero human interaction required.
+> **An always-on, fully autonomous AI agent** that wakes itself up every morning, collects intelligence from 6 connected sources, generates a personalized daily brief using Amazon Bedrock (Nova), and delivers it via Email, Telegram, and Slack — with zero human interaction.
 
-![AWS](https://img.shields.io/badge/AWS-Powered-FF9900?style=flat-square&logo=amazonaws)
-![Bedrock](https://img.shields.io/badge/Amazon_Bedrock-Nova-blue?style=flat-square)
-![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python)
-![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react)
-![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+![AWS](https://img.shields.io/badge/AWS-Production_Ready-FF9900?style=for-the-badge&logo=amazonaws)
+![Bedrock](https://img.shields.io/badge/Amazon_Bedrock-Nova-232F3E?style=for-the-badge&logo=amazonaws)
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 
 ---
 
-## 🎯 What is PULSE?
+## 🎯 Challenge: Build an Always-On Agent
 
-PULSE is a **production-quality Always-On AI Agent** built for the AWS Builder Center Weekend Challenge. It wakes itself up every morning at 7:00 AM, gathers intelligence from 6+ connected sources, processes everything through Amazon Bedrock (Nova), and delivers a comprehensive Morning Brief automatically.
+PULSE satisfies **every judging criterion** for the AWS Builder Center "Build an Always-On Agent Weekend Challenge":
 
-**No buttons to press. No prompts to write. No interaction needed.**
+| Criterion | How PULSE Delivers |
+|-----------|-------------------|
+| **Always-On Agent** | EventBridge Scheduler triggers daily at 7 AM — zero human interaction |
+| **Amazon Bedrock** | Nova model generates intelligent, structured Morning Briefs |
+| **Autonomous Operation** | Full pipeline: Observe → Reason → Plan → Generate → Deliver → Learn |
+| **Multiple AWS Services** | 12+ services used naturally in production architecture |
+| **Real-World Value** | Actionable daily intelligence with priority scores and recommendations |
+| **Production Quality** | Docker, error handling, retry logic, structured logging, JWT auth |
+
+---
+
+## 🧠 Agent Intelligence: Cognitive Pipeline
+
+PULSE operates on a **6-phase autonomous cognitive loop** — no prompts, no buttons, no interaction:
+
+```
+┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+│  OBSERVE │───▶│  REASON  │───▶│   PLAN   │───▶│ GENERATE │───▶│ DELIVER  │───▶│  LEARN   │
+│          │    │          │    │          │    │          │    │          │    │          │
+│ Collect  │    │ Analyze  │    │Prioritize│    │ Bedrock  │    │ SES +    │    │CloudWatch│
+│ 6 sources│    │ patterns │    │ actions  │    │ Nova AI  │    │ Telegram │    │ metrics  │
+│ parallel │    │ urgency  │    │ focus    │    │ generate │    │ + Slack  │    │ outcomes │
+└──────────┘    └──────────┘    └──────────┘    └──────────┘    └──────────┘    └──────────┘
+```
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                        PULSE Architecture                               │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                         │
-│  ┌──────────────────┐     ┌──────────────────┐                         │
-│  │ Amazon EventBridge│────▶│   AWS Lambda      │                         │
-│  │    Scheduler      │     │  (Trigger Agent)  │                         │
-│  │  (Cron: 7AM)     │     └────────┬─────────┘                         │
-│  └──────────────────┘              │                                    │
-│                                    ▼                                    │
-│  ┌─────────────────────────────────────────────────────────────┐       │
-│  │              PULSE Backend (FastAPI on App Runner)            │       │
-│  │                                                              │       │
-│  │  ┌─────────────┐  ┌──────────────┐  ┌─────────────────┐    │       │
-│  │  │  Collectors  │  │ AI Agent     │  │   Delivery      │    │       │
-│  │  │             │  │  (Bedrock)   │  │                 │    │       │
-│  │  │ • Calendar  │──▶│ • Nova Model │──▶│ • Amazon SES   │    │       │
-│  │  │ • Gmail     │  │ • Prompts   │  │ • Telegram     │    │       │
-│  │  │ • GitHub    │  │ • Analysis  │  │ • Slack        │    │       │
-│  │  │ • Weather   │  │             │  │                 │    │       │
-│  │  │ • Notion    │  └──────────────┘  └─────────────────┘    │       │
-│  │  │ • RSS News  │                                            │       │
-│  │  └─────────────┘                                            │       │
-│  └─────────────────────────────────────────────────────────────┘       │
-│                                                                         │
-│  ┌──────────────┐  ┌────────────┐  ┌────────────┐  ┌──────────┐       │
-│  │ CloudWatch   │  │  Secrets   │  │   S3       │  │ CloudFront│       │
-│  │ (Logs/Alarm) │  │  Manager   │  │ (Storage)  │  │ (CDN)     │       │
-│  └──────────────┘  └────────────┘  └────────────┘  └──────────┘       │
-│                                                                         │
-│  ┌─────────────────────────────────────────────────────────────┐       │
-│  │           Frontend Dashboard (React + Vite)                  │       │
-│  │  ┌──────────┐ ┌──────────┐ ┌────────┐ ┌───────────────┐    │       │
-│  │  │  Brief   │ │   Logs   │ │ Health │ │ Service Status│    │       │
-│  │  │  Card    │ │  Panel   │ │ Cards  │ │    Panel      │    │       │
-│  │  └──────────┘ └──────────┘ └────────┘ └───────────────┘    │       │
-│  └─────────────────────────────────────────────────────────────┘       │
-└─────────────────────────────────────────────────────────────────────────┘
+                         ┌─────────────────────────────┐
+                         │   Amazon EventBridge         │
+                         │   Scheduler (cron: 7 AM)     │
+                         └─────────────┬───────────────┘
+                                       │ Triggers daily
+                                       ▼
+                         ┌─────────────────────────────┐
+                         │      AWS Lambda              │
+                         │   (Execution Trigger)        │
+                         └─────────────┬───────────────┘
+                                       │ Invokes
+                                       ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                   FastAPI Backend (App Runner)                     │
+│                                                                    │
+│  ┌────────────────────────────────────────────────────────────┐   │
+│  │                    OBSERVE Phase                             │   │
+│  │  ┌─────────┐ ┌──────┐ ┌────────┐ ┌─────────┐ ┌─────────┐ │   │
+│  │  │Calendar │ │Gmail │ │GitHub  │ │Weather │ │ Notion  │ │   │
+│  │  └────┬────┘ └──┬───┘ └───┬────┘ └────┬────┘ └────┬────┘ │   │
+│  │       └──────────┴─────────┴───────────┴───────────┘       │   │
+│  └────────────────────────────┬───────────────────────────────┘   │
+│                               ▼                                    │
+│  ┌──────────────────────────────────────────────────────────┐     │
+│  │         REASON + PLAN → GENERATE (Bedrock Nova)           │     │
+│  │    ┌─────────────────────────────────────────────────┐    │     │
+│  │    │  AWS Secrets Manager ──▶ Amazon Bedrock (Nova)   │    │     │
+│  │    │                          Converse API            │    │     │
+│  │    │                          Structured JSON output  │    │     │
+│  │    └─────────────────────────────────────────────────┘    │     │
+│  └────────────────────────────┬─────────────────────────────┘     │
+│                               ▼                                    │
+│  ┌──────────────────────────────────────────────────────────┐     │
+│  │                    DELIVER Phase                           │     │
+│  │    ┌──────────┐    ┌───────────┐    ┌────────────┐       │     │
+│  │    │Amazon SES│    │ Telegram  │    │   Slack    │       │     │
+│  │    │  Email   │    │    Bot    │    │  Webhook   │       │     │
+│  │    └──────────┘    └───────────┘    └────────────┘       │     │
+│  └──────────────────────────────────────────────────────────┘     │
+│                               ▼                                    │
+│  ┌──────────────────────────────────────────────────────────┐     │
+│  │                     LEARN Phase                            │     │
+│  │    ┌──────────────┐  ┌──────────┐  ┌────────────────┐    │     │
+│  │    │ CloudWatch   │  │  SQLite  │  │  S3 Archive    │    │     │
+│  │    │ Metrics +    │  │ History  │  │  Brief Storage │    │     │
+│  │    │ Alarms       │  │          │  │                │    │     │
+│  │    └──────────────┘  └──────────┘  └────────────────┘    │     │
+│  └──────────────────────────────────────────────────────────┘     │
+└──────────────────────────────────────────────────────────────────┘
+                               ▲
+                               │ Dashboard
+┌──────────────────────────────┴───────────────────────────────────┐
+│              React Dashboard (CloudFront CDN)                      │
+│  ┌────────┐ ┌──────────┐ ┌──────────┐ ┌────────┐ ┌───────────┐  │
+│  │ Brief  │ │ Agent    │ │ Timeline │ │ Health │ │  Metrics  │  │
+│  │ Card   │ │ Workflow │ │          │ │ Status │ │  Panel    │  │
+│  └────────┘ └──────────┘ └──────────┘ └────────┘ └───────────┘  │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🛠️ AWS Services Used
+## 🛠️ AWS Services Used (12+)
 
-| Service | Purpose |
-|---------|---------|
-| **Amazon Bedrock** | AI brief generation using Nova model |
-| **Amazon EventBridge Scheduler** | Cron-based daily trigger (7:00 AM) |
-| **AWS Lambda** | Serverless execution trigger |
-| **Amazon CloudWatch** | Logging, metrics, alarms, dashboard |
-| **AWS Secrets Manager** | Secure credential storage |
-| **Amazon SES** | Email delivery |
-| **Amazon S3** | Brief archive storage |
-| **AWS App Runner** | Backend hosting (FastAPI) |
-| **Amazon CloudFront** | Frontend CDN distribution |
-| **Amazon Route 53** | DNS management |
-| **Amazon ECR** | Container registry |
-| **AWS IAM** | Roles and permissions |
+| # | Service | Purpose | Integration |
+|---|---------|---------|-------------|
+| 1 | **Amazon Bedrock** | AI brief generation | Nova Micro via Converse API |
+| 2 | **EventBridge Scheduler** | Daily cron trigger | `cron(0 7 * * ? *)` |
+| 3 | **AWS Lambda** | Serverless execution | Python 3.12, 512MB, 300s timeout |
+| 4 | **Amazon CloudWatch** | Logs, metrics, alarms | Custom namespace `PULSE/Agent` |
+| 5 | **AWS Secrets Manager** | Credential storage | Prefix: `pulse/` |
+| 6 | **Amazon SES** | Email delivery | HTML + plaintext briefs |
+| 7 | **Amazon S3** | Brief archive | Lifecycle to Glacier at 90 days |
+| 8 | **AWS App Runner** | Backend hosting | Auto-scaling FastAPI container |
+| 9 | **Amazon CloudFront** | Frontend CDN | React SPA distribution |
+| 10 | **Amazon Route 53** | DNS management | Custom domain routing |
+| 11 | **Amazon ECR** | Container registry | Docker image storage |
+| 12 | **AWS IAM** | Security | Least-privilege roles |
 
 ---
 
@@ -86,33 +128,53 @@ PULSE is a **production-quality Always-On AI Agent** built for the AWS Builder C
 
 ```
 pulse/
-├── backend/
+├── backend/                    # Python FastAPI Backend
 │   ├── app/
-│   │   ├── agents/          # AI agent logic (Bedrock orchestration)
-│   │   ├── api/             # FastAPI REST endpoints
-│   │   ├── core/            # Config, security, database, logging
-│   │   ├── delivery/        # SES, Telegram, Slack delivery
-│   │   ├── models/          # Data models
-│   │   ├── schemas/         # Pydantic schemas
-│   │   └── services/        # Data collectors (GitHub, Gmail, etc.)
+│   │   ├── agents/            # AI Agent Logic
+│   │   │   ├── orchestrator.py   # 6-phase pipeline
+│   │   │   └── bedrock_agent.py  # Bedrock Converse API
+│   │   ├── api/               # REST Endpoints
+│   │   │   └── routes.py        # JWT-protected routes
+│   │   ├── core/              # Infrastructure
+│   │   │   ├── config.py        # Pydantic settings
+│   │   │   ├── database.py      # SQLite + migrations
+│   │   │   ├── logging.py       # JSON structured logs
+│   │   │   └── security.py      # JWT auth
+│   │   ├── delivery/          # Output Channels
+│   │   │   ├── ses_delivery.py   # Amazon SES
+│   │   │   ├── telegram_delivery.py
+│   │   │   └── slack_delivery.py
+│   │   └── services/          # Data Collectors
+│   │       ├── calendar_service.py
+│   │       ├── gmail_service.py
+│   │       ├── github_service.py
+│   │       ├── weather_service.py
+│   │       ├── notion_service.py
+│   │       ├── rss_service.py
+│   │       └── secrets_service.py
 │   ├── tests/
 │   ├── Dockerfile
-│   ├── requirements.txt
-│   └── .env.example
-├── frontend/
+│   └── requirements.txt
+├── frontend/                   # React + Vite Dashboard
 │   ├── src/
-│   │   ├── components/      # React UI components
-│   │   ├── pages/           # Dashboard & Login pages
-│   │   ├── hooks/           # React hooks
-│   │   └── utils/           # API client
-│   ├── public/
-│   ├── package.json
-│   └── vite.config.js
-├── infrastructure/
-│   ├── cloudformation/      # CloudFormation templates
-│   ├── lambda/              # Lambda function code
-│   └── scripts/             # Deployment scripts
+│   │   ├── components/        # UI Components
+│   │   │   ├── AgentWorkflow.jsx
+│   │   │   ├── BriefCard.jsx
+│   │   │   ├── ExecutionLogs.jsx
+│   │   │   ├── Header.jsx
+│   │   │   ├── MetricsPanel.jsx
+│   │   │   ├── ServiceHealth.jsx
+│   │   │   └── StatusCard.jsx
+│   │   ├── pages/
+│   │   └── utils/
+│   └── package.json
+├── infrastructure/             # AWS Infrastructure
+│   ├── cloudformation/        # IaC Templates
+│   ├── lambda/                # Lambda Function
+│   └── scripts/               # Deployment Automation
 ├── docs/
+│   ├── DEPLOYMENT.md
+│   ├── DEMO.md
 │   └── screenshots/
 └── README.md
 ```
@@ -123,159 +185,159 @@ pulse/
 
 ### Prerequisites
 
-- AWS CLI configured with appropriate permissions
+- AWS CLI v2 (configured with credentials)
 - Python 3.12+
 - Node.js 18+
-- Docker (for deployment)
+- Docker (for AWS deployment)
 
-### 1. Clone & Setup
+### Local Development
 
 ```bash
+# Clone
 git clone git@github.com:reetika0104/AgentPulse.git
 cd AgentPulse
-```
 
-### 2. Backend Setup
-
-```bash
+# Backend
 cd backend
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+venv\Scripts\activate        # Windows
 pip install -r requirements.txt
-cp .env.example .env
-# Edit .env with your configuration
-uvicorn app.main:app --reload
-```
+copy .env.example .env       # Configure your settings
+uvicorn app.main:app --reload --port 8000
 
-### 3. Frontend Setup
-
-```bash
+# Frontend (new terminal)
 cd frontend
 npm install
 npm run dev
 ```
 
-### 4. Deploy to AWS
-
-```bash
-cd infrastructure/scripts
-chmod +x deploy.sh deploy-apprunner.sh
-./deploy.sh production
-./deploy-apprunner.sh production
+### Login Credentials (Demo)
+```
+Username: admin
+Password: pulse2026
 ```
 
 ---
 
-## 🔑 Environment Variables
+## ☁️ AWS Deployment
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `AWS_REGION` | AWS region | Yes |
-| `BEDROCK_MODEL_ID` | Bedrock model (default: amazon.nova-micro-v1:0) | Yes |
-| `SES_SENDER_EMAIL` | Verified SES sender email | No |
-| `SES_RECIPIENT_EMAIL` | Email recipient | No |
-| `GITHUB_TOKEN` | GitHub personal access token | No |
-| `WEATHER_API_KEY` | OpenWeatherMap API key | No |
-| `TELEGRAM_BOT_TOKEN` | Telegram bot token | No |
-| `SLACK_WEBHOOK_URL` | Slack incoming webhook URL | No |
-| `NOTION_API_KEY` | Notion integration key | No |
-| `SECRET_KEY` | JWT signing key | Yes |
+### One-Command Deploy
+
+```bash
+cd infrastructure/scripts
+./deploy.sh production          # CloudFormation + Lambda
+./deploy-apprunner.sh production # Backend on App Runner
+./deploy-frontend.sh production  # Frontend on S3 + CloudFront
+```
+
+### Detailed Steps
+
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the complete guide.
 
 ---
 
-## 🤖 How It Works
+## 💰 Cost Estimate (AWS Free Tier Friendly)
 
-1. **⏰ EventBridge Scheduler** fires at 7:00 AM every day
-2. **🔄 Lambda Function** is invoked, triggers the PULSE backend
-3. **📡 Data Collectors** gather information from 6 sources in parallel
-4. **🧠 Amazon Bedrock (Nova)** analyzes all data and generates the Morning Brief
-5. **📬 Delivery Channels** send the brief via Email, Telegram, and Slack
-6. **📊 CloudWatch** logs metrics and monitors execution health
+| Service | Monthly Cost | Notes |
+|---------|-------------|-------|
+| Lambda | **$0.00** | 30 invocations × 300s = Free Tier |
+| EventBridge | **$0.00** | Free for schedule-based triggers |
+| Bedrock (Nova Micro) | **~$0.50** | ~30 calls × ~4K tokens |
+| SES | **$0.00** | First 62K emails free from EC2/Lambda |
+| S3 | **$0.01** | Minimal storage for briefs |
+| CloudWatch | **$0.00** | Free tier covers basic metrics |
+| App Runner | **~$5.00** | Smallest instance |
+| **Total** | **~$5.50/month** | |
+
+---
+
+## 🔐 Security
+
+- **JWT Authentication** — All API endpoints protected
+- **AWS Secrets Manager** — No hardcoded credentials
+- **IAM Least Privilege** — Scoped policies per service
+- **HTTPS Only** — CloudFront enforces TLS
+- **Input Validation** — Pydantic schemas on all inputs
+- **Structured Logging** — Full audit trail in CloudWatch
+
+---
+
+## 📊 CloudWatch Metrics
+
+PULSE publishes custom metrics to the `PULSE/Agent` namespace:
+
+| Metric | Description |
+|--------|-------------|
+| `ExecutionDuration` | Pipeline duration in seconds |
+| `ExecutionCount` | Total runs (success/failure dimensions) |
+| `TokensUsed` | Bedrock token consumption |
+| `SourcesCollected` | Number of sources responding |
+| `DeliverySuccess` | Successful deliveries per channel |
 
 ---
 
 ## 📸 Screenshots
 
-> Screenshots are stored in `docs/screenshots/`
+| Dashboard | Agent Workflow |
+|-----------|---------------|
+| ![Dashboard](docs/screenshots/dashboard.png) | ![Workflow](docs/screenshots/workflow.png) |
 
-- Dashboard Overview
-- Morning Brief Card
-- Execution Logs
-- Service Health Panel
-- Login Page
+| Brief Card | Service Health |
+|------------|---------------|
+| ![Brief](docs/screenshots/brief.png) | ![Health](docs/screenshots/health.png) |
 
 ---
 
 ## 🧪 Demo Script
 
 ```bash
-# 1. Start the backend
-cd backend && uvicorn app.main:app --host 0.0.0.0 --port 8000
+# 1. Start backend
+cd backend && uvicorn app.main:app --port 8000
 
-# 2. Start the frontend
+# 2. Start frontend  
 cd frontend && npm run dev
 
-# 3. Login with demo credentials
-# Username: admin
-# Password: pulse2026
-
-# 4. Click "Run Now" to trigger a brief manually
-
-# 5. View the generated brief in the dashboard
+# 3. Open http://localhost:3000
+# 4. Login: admin / pulse2026
+# 5. Click "Run Agent" — watch the pipeline execute
+# 6. View: Brief Card, Execution Timeline, Agent Metrics, Service Health
 ```
 
 ---
 
-## 📋 AWS Deployment Commands
+## 🗺️ Future Roadmap
 
-```bash
-# Deploy CloudFormation stack
-aws cloudformation deploy \
-  --template-file infrastructure/cloudformation/pulse-stack.yaml \
-  --stack-name pulse-stack-production \
-  --capabilities CAPABILITY_NAMED_IAM \
-  --region us-east-1
-
-# Update Lambda code
-aws lambda update-function-code \
-  --function-name pulse-morning-brief-production \
-  --zip-file fileb://infrastructure/lambda/lambda-package.zip
-
-# Verify SES email
-aws ses verify-email-identity --email-address your@email.com
-
-# Create secrets
-aws secretsmanager create-secret \
-  --name pulse/api-keys \
-  --secret-string '{"github_token":"...","weather_api_key":"..."}'
-
-# Check CloudWatch logs
-aws logs tail /aws/lambda/pulse-morning-brief-production --follow
-```
+- [ ] **Multi-user support** with Cognito
+- [ ] **DynamoDB migration** for serverless data layer
+- [ ] **Voice briefing** via Amazon Polly
+- [ ] **Feedback loop** — user rates brief quality
+- [ ] **Custom data sources** — Jira, Linear, Confluence
+- [ ] **Weekly digest** in addition to daily
+- [ ] **Mobile app** with push notifications
 
 ---
 
-## 🏆 Challenge Criteria Satisfaction
+## 📋 Technical Highlights
 
-| Criterion | How PULSE Satisfies It |
-|-----------|----------------------|
-| Always-On Agent | Runs daily via EventBridge Scheduler — zero interaction |
-| Amazon Bedrock | Nova model generates personalized Morning Briefs |
-| AWS Services | 12+ AWS services used naturally in architecture |
-| Production Quality | Docker, CI/CD, error handling, retry, structured logging |
-| No User Interaction | Fully autonomous — scheduled, collected, generated, delivered |
-| Multiple Data Sources | 6 sources: Calendar, Gmail, GitHub, Weather, Notion, RSS |
-| Useful Output | Actionable daily brief with priorities, urgency scores, tips |
+- **Bedrock Converse API** — Structured JSON output, token tracking
+- **Async Pipeline** — All 6 data sources collected in parallel
+- **Graceful Degradation** — Falls back to demo data if APIs unavailable
+- **Retry Logic** — EventBridge retries up to 3 times on failure
+- **Structured Logging** — JSON format, CloudWatch-compatible
+- **SQLite → DynamoDB** — Easy migration path when needed
+- **Dark Theme Dashboard** — Glassmorphism, professional animations
+- **Phase Timing** — Each pipeline step measured and reported
 
 ---
 
 ## 📄 License
 
-MIT License — Built for the AWS Builder Center Weekend Challenge 2026.
+MIT License — Built for AWS Builder Center Weekend Challenge 2026.
 
 ---
 
 <p align="center">
   <strong>⚡ PULSE — Your AI Digital Chief of Staff</strong><br/>
-  <em>Powered by Amazon Bedrock | Built on AWS</em>
+  <em>Always-On • Fully Autonomous • Powered by Amazon Bedrock</em><br/><br/>
+  <sub>Built with ❤️ for the AWS Builder Center Weekend Challenge</sub>
 </p>

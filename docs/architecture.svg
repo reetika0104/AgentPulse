@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <linearGradient id="awsGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff9900"/>
+      <stop offset="100%" stop-color="#ffb84d"/>
+    </linearGradient>
+    <linearGradient id="pulseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="900" height="600" fill="url(#bgGrad)" rx="12"/>
+  
+  <!-- Title -->
+  <text x="450" y="40" text-anchor="middle" font-family="Inter,sans-serif" font-size="20" font-weight="700" fill="url(#pulseGrad)">⚡ PULSE Architecture</text>
+  <text x="450" y="58" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#94a3b8">Personal Unified Life &amp; Productivity Executive — Always-On AI Agent</text>
+
+  <!-- EventBridge -->
+  <rect x="360" y="75" width="180" height="50" rx="8" fill="#1e293b" stroke="#ff9900" stroke-width="1.5"/>
+  <text x="450" y="97" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#ff9900">Amazon EventBridge</text>
+  <text x="450" y="112" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#94a3b8">Scheduler: cron(0 7 * * ? *)</text>
+
+  <!-- Arrow -->
+  <line x1="450" y1="125" x2="450" y2="145" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4"/>
+  <polygon points="445,143 450,150 455,143" fill="#6366f1"/>
+  
+  <!-- Lambda -->
+  <rect x="375" y="150" width="150" height="45" rx="8" fill="#1e293b" stroke="#ff9900" stroke-width="1.5"/>
+  <text x="450" y="170" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#ff9900">AWS Lambda</text>
+  <text x="450" y="183" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">Python 3.12 • 512MB</text>
+
+  <!-- Arrow to Backend -->
+  <line x1="450" y1="195" x2="450" y2="220" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4"/>
+  <polygon points="445,218 450,225 455,218" fill="#6366f1"/>
+
+  <!-- Backend Box -->
+  <rect x="80" y="225" width="740" height="280" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+  <text x="450" y="245" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#e2e8f0">FastAPI Backend (AWS App Runner)</text>
+
+  <!-- OBSERVE -->
+  <rect x="100" y="260" width="200" height="100" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="1"/>
+  <text x="200" y="278" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#3b82f6">👁️ OBSERVE</text>
+  <text x="200" y="298" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">📅 Google Calendar</text>
+  <text x="200" y="312" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">📧 Gmail</text>
+  <text x="200" y="326" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">🐙 GitHub • 🌤️ Weather</text>
+  <text x="200" y="340" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">📝 Notion • 📰 RSS</text>
+
+  <!-- Arrow -->
+  <line x1="300" y1="310" x2="330" y2="310" stroke="#6366f1" stroke-width="1.5"/>
+  <polygon points="328,306 335,310 328,314" fill="#6366f1"/>
+
+  <!-- REASON + PLAN + GENERATE -->
+  <rect x="335" y="260" width="230" height="100" rx="8" fill="#1e293b" stroke="#8b5cf6" stroke-width="1"/>
+  <text x="450" y="278" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#8b5cf6">🧠 REASON → 📋 PLAN → ⚡ GENERATE</text>
+  <text x="450" y="300" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#c4b5fd">Amazon Bedrock (Nova)</text>
+  <text x="450" y="316" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">Converse API • Structured JSON</text>
+  <text x="450" y="332" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">Priority Score • Recommendations</text>
+  <text x="450" y="348" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">Token Tracking • Latency Metrics</text>
+
+  <!-- Arrow -->
+  <line x1="565" y1="310" x2="595" y2="310" stroke="#6366f1" stroke-width="1.5"/>
+  <polygon points="593,306 600,310 593,314" fill="#6366f1"/>
+
+  <!-- DELIVER -->
+  <rect x="600" y="260" width="200" height="100" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="1"/>
+  <text x="700" y="278" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#10b981">📬 DELIVER</text>
+  <text x="700" y="298" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">📧 Amazon SES (Email)</text>
+  <text x="700" y="312" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">📱 Telegram Bot</text>
+  <text x="700" y="326" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">💬 Slack Webhook</text>
+  <text x="700" y="345" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#6b7280">Zero interaction required</text>
+
+  <!-- LEARN -->
+  <rect x="100" y="380" width="700" height="55" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="1"/>
+  <text x="450" y="398" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#f59e0b">📊 LEARN</text>
+  <text x="200" y="418" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">CloudWatch Metrics + Alarms</text>
+  <text x="400" y="418" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">SQLite Execution History</text>
+  <text x="600" y="418" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">S3 Brief Archive</text>
+
+  <!-- Supporting Services -->
+  <rect x="100" y="450" width="145" height="40" rx="6" fill="#1e293b" stroke="#475569" stroke-width="0.5"/>
+  <text x="172" y="474" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">🔐 Secrets Manager</text>
+
+  <rect x="260" y="450" width="145" height="40" rx="6" fill="#1e293b" stroke="#475569" stroke-width="0.5"/>
+  <text x="332" y="474" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">📦 Amazon S3</text>
+
+  <rect x="420" y="450" width="145" height="40" rx="6" fill="#1e293b" stroke="#475569" stroke-width="0.5"/>
+  <text x="492" y="474" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">🌐 CloudFront CDN</text>
+
+  <rect x="580" y="450" width="145" height="40" rx="6" fill="#1e293b" stroke="#475569" stroke-width="0.5"/>
+  <text x="652" y="474" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">🌍 Route 53 DNS</text>
+
+  <!-- Dashboard -->
+  <rect x="200" y="520" width="500" height="55" rx="10" fill="#1e293b" stroke="url(#pulseGrad)" stroke-width="1.5"/>
+  <text x="450" y="545" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#e2e8f0">React Dashboard (CloudFront)</text>
+  <text x="450" y="562" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#94a3b8">Brief Card • Agent Workflow • Timeline • Metrics • Service Health</text>
+
+  <!-- Arrow from backend to dashboard -->
+  <line x1="450" y1="505" x2="450" y2="520" stroke="#6366f1" stroke-width="1" stroke-dasharray="3"/>
+</svg>
