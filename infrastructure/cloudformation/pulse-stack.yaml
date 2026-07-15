@@ -1,0 +1,292 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'PULSE - AI Digital Chief of Staff - Complete AWS Infrastructure'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: production
+    AllowedValues: [production, staging, development]
+
+  ScheduleExpression:
+    Type: String
+    Default: 'cron(0 7 * * ? *)'
+    Description: 'Cron expression for morning brief schedule (default 7AM UTC)'
+
+  BedrockModelId:
+    Type: String
+    Default: 'amazon.nova-micro-v1:0'
+    Description: 'Amazon Bedrock model ID'
+
+  SenderEmail:
+    Type: String
+    Default: ''
+    Description: 'SES verified sender email'
+
+  RecipientEmail:
+    Type: String
+    Default: ''
+    Description: 'Brief recipient email'
+
+  PulseApiUrl:
+    Type: String
+    Default: ''
+    Description: 'PULSE Backend API URL (App Runner)'
+
+Resources:
+  # ─── S3 Bucket for Brief Storage ─────────────────────────────────
+  PulseBriefsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'pulse-agent-briefs-${AWS::AccountId}'
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Id: ArchiveOldBriefs
+            Status: Enabled
+            Transitions:
+              - StorageClass: GLACIER
+                TransitionInDays: 90
+      Tags:
+        - Key: Project
+          Value: PULSE
+        - Key: Environment
+          Value: !Ref Environment
+
+  # ─── IAM Role for Lambda ─────────────────────────────────────────
+  PulseLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'pulse-lambda-role-${Environment}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: PulseLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                  - bedrock:Converse
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - ses:SendEmail
+                  - ses:SendRawEmail
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pulse/*'
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                Resource: !Sub '${PulseBriefsBucket.Arn}/*'
+              - Effect: Allow
+                Action:
+                  - cloudwatch:PutMetricData
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+      Tags:
+        - Key: Project
+          Value: PULSE
+
+  # ─── Lambda Function ─────────────────────────────────────────────
+  PulseLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'pulse-morning-brief-${Environment}'
+      Runtime: python3.12
+      Handler: handler.handler
+      Role: !GetAtt PulseLambdaRole.Arn
+      Timeout: 300
+      MemorySize: 512
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref Environment
+          PULSE_API_URL: !Ref PulseApiUrl
+          PULSE_API_KEY: pulse2026
+          AWS_REGION_NAME: !Ref AWS::Region
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+      Code:
+        ZipFile: |
+          # Placeholder - deploy actual code via CI/CD
+          def handler(event, context):
+              return {"statusCode": 200, "body": "PULSE Lambda placeholder"}
+      Tags:
+        - Key: Project
+          Value: PULSE
+        - Key: Environment
+          Value: !Ref Environment
+
+  # ─── CloudWatch Log Group ────────────────────────────────────────
+  PulseLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/pulse-morning-brief-${Environment}'
+      RetentionInDays: 30
+
+  # ─── EventBridge Scheduler ──────────────────────────────────────
+  PulseSchedulerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'pulse-scheduler-role-${Environment}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: scheduler.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: InvokeLambda
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt PulseLambdaFunction.Arn
+
+  PulseSchedule:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Name: !Sub 'pulse-daily-brief-${Environment}'
+      Description: 'Triggers PULSE morning brief every day at 7:00 AM'
+      ScheduleExpression: !Ref ScheduleExpression
+      ScheduleExpressionTimezone: 'America/New_York'
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      State: ENABLED
+      Target:
+        Arn: !GetAtt PulseLambdaFunction.Arn
+        RoleArn: !GetAtt PulseSchedulerRole.Arn
+        Input: '{"source": "aws.scheduler", "detail-type": "Scheduled Event"}'
+        RetryPolicy:
+          MaximumRetryAttempts: 3
+          MaximumEventAgeInSeconds: 3600
+
+  # ─── Secrets Manager ─────────────────────────────────────────────
+  PulseApiKeys:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: pulse/api-keys
+      Description: 'PULSE Agent API keys and tokens'
+      SecretString: !Sub |
+        {
+          "github_token": "",
+          "weather_api_key": "",
+          "telegram_bot_token": "",
+          "telegram_chat_id": "",
+          "slack_webhook_url": "",
+          "notion_api_key": ""
+        }
+      Tags:
+        - Key: Project
+          Value: PULSE
+
+  # ─── SES Configuration ──────────────────────────────────────────
+  PulseSesConfigSet:
+    Type: AWS::SES::ConfigurationSet
+    Properties:
+      Name: pulse-delivery-config
+
+  # ─── CloudWatch Dashboard ───────────────────────────────────────
+  PulseDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Sub 'PULSE-Agent-${Environment}'
+      DashboardBody: !Sub |
+        {
+          "widgets": [
+            {
+              "type": "metric",
+              "properties": {
+                "title": "Execution Duration",
+                "metrics": [
+                  ["PULSE/Agent", "ExecutionDuration", "AgentName", "PULSE", "Status", "success"]
+                ],
+                "period": 86400,
+                "region": "${AWS::Region}"
+              }
+            },
+            {
+              "type": "metric",
+              "properties": {
+                "title": "Execution Count",
+                "metrics": [
+                  ["PULSE/Agent", "ExecutionCount", "AgentName", "PULSE", "Status", "success"],
+                  ["PULSE/Agent", "ExecutionCount", "AgentName", "PULSE", "Status", "error"]
+                ],
+                "period": 86400,
+                "region": "${AWS::Region}"
+              }
+            },
+            {
+              "type": "log",
+              "properties": {
+                "title": "Recent Logs",
+                "query": "fields @timestamp, @message\n| sort @timestamp desc\n| limit 50",
+                "region": "${AWS::Region}",
+                "stacked": false,
+                "view": "table"
+              }
+            }
+          ]
+        }
+
+  # ─── CloudWatch Alarm ───────────────────────────────────────────
+  PulseErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub 'PULSE-Execution-Errors-${Environment}'
+      AlarmDescription: 'Alert when PULSE agent has execution errors'
+      Namespace: PULSE/Agent
+      MetricName: ExecutionCount
+      Dimensions:
+        - Name: AgentName
+          Value: PULSE
+        - Name: Status
+          Value: error
+      Statistic: Sum
+      Period: 86400
+      EvaluationPeriods: 1
+      Threshold: 3
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+
+Outputs:
+  LambdaFunctionArn:
+    Description: 'PULSE Lambda Function ARN'
+    Value: !GetAtt PulseLambdaFunction.Arn
+    Export:
+      Name: !Sub 'pulse-lambda-arn-${Environment}'
+
+  S3BucketName:
+    Description: 'S3 Bucket for brief storage'
+    Value: !Ref PulseBriefsBucket
+
+  ScheduleName:
+    Description: 'EventBridge Schedule Name'
+    Value: !Ref PulseSchedule
+
+  LambdaRoleArn:
+    Description: 'Lambda execution role ARN'
+    Value: !GetAtt PulseLambdaRole.Arn
