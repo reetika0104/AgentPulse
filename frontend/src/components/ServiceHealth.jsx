@@ -18,19 +18,21 @@ export default function ServiceHealth({ health }) {
     const val = services[key];
     if (!val) return 'operational'; // Assume healthy for AWS-native
     if (val === 'connected' || val === 'configured' || val === 'active' || val === 'publishing' || val === 'ready' || val === 'integrated' || val === 'running' || val === 'distributed') return 'operational';
-    if (val === 'not_configured' || val === 'pending') return 'pending';
+    if (val === 'not_configured') return 'standby';
+    if (val === 'pending') return 'pending';
     return 'operational';
   };
 
   const getStatusColor = (status) => {
     switch (status) {
       case 'operational': return 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.5)]';
+      case 'standby': return 'bg-gray-400 shadow-[0_0_6px_rgba(156,163,175,0.3)]';
       case 'pending': return 'bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.5)]';
       default: return 'bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.5)]';
     }
   };
 
-  const operationalCount = AWS_SERVICES.filter(s => getStatus(s.key) === 'operational').length;
+  const operationalCount = AWS_SERVICES.filter(s => getStatus(s.key) !== 'standby').length;
 
   return (
     <div className="card-glass">

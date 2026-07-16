@@ -126,8 +126,13 @@ export default function Dashboard({ onLogout }) {
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Brief - Takes 7 columns */}
-          <div className="lg:col-span-7 animate-fade-in-up stagger-5">
-            <BriefCard brief={brief} />
+          <div className="lg:col-span-7 space-y-6">
+            <div className="animate-fade-in-up stagger-5">
+              <BriefCard brief={brief} />
+            </div>
+            <div className="animate-fade-in-up stagger-6">
+              <ExecutionLogs executions={executions} />
+            </div>
           </div>
 
           {/* Right Sidebar - 5 columns */}
@@ -137,9 +142,6 @@ export default function Dashboard({ onLogout }) {
             </div>
             <div className="animate-fade-in-up stagger-4">
               <ServiceHealth health={health} />
-            </div>
-            <div className="animate-fade-in-up stagger-5">
-              <ExecutionLogs executions={executions} />
             </div>
           </div>
         </div>
