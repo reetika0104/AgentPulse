@@ -111,41 +111,45 @@ def _format_brief_html(brief: Dict[str, Any]) -> str:
     return f"""
     <html>
     <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#f9fafb;">
-        <div style="background:linear-gradient(135deg,#1e293b,#334155);color:white;padding:32px;border-radius:12px;margin-bottom:20px;">
-            <h1 style="margin:0;font-size:24px;">⚡ PULSE</h1>
+        <div style="background:#1e293b;color:white;padding:32px;border-radius:12px;margin-bottom:20px;">
+            <h1 style="margin:0;font-size:24px;">PULSE</h1>
             <p style="margin:8px 0 0;opacity:0.8;font-size:14px;">Your AI Digital Chief of Staff</p>
             <p style="margin:16px 0 0;font-size:18px;">{brief.get('greeting', 'Good morning!')}</p>
         </div>
         
         <div style="background:white;padding:24px;border-radius:12px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-                <div style="background:{priority_color};color:white;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;">
-                    {priority}
-                </div>
-                <div>
-                    <p style="margin:0;font-size:12px;color:#6b7280;">Priority Score</p>
-                    <p style="margin:0;font-weight:600;">{brief.get('suggested_focus', '')}</p>
-                </div>
-            </div>
-            <p style="color:#374151;line-height:1.6;">{brief.get('executive_summary', '')}</p>
+            <table cellpadding="0" cellspacing="0" border="0" style="width:100%;">
+                <tr>
+                    <td style="width:56px;vertical-align:top;padding-right:16px;">
+                        <div style="background:{priority_color};color:white;width:48px;height:48px;border-radius:50%;text-align:center;line-height:48px;font-weight:bold;font-size:20px;">
+                            {priority}
+                        </div>
+                    </td>
+                    <td style="vertical-align:top;">
+                        <p style="margin:0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">Priority Score</p>
+                        <p style="margin:4px 0 0;font-weight:600;font-size:15px;color:#1f2937;">{brief.get('suggested_focus', '')}</p>
+                    </td>
+                </tr>
+            </table>
+            <p style="color:#374151;line-height:1.6;margin-top:16px;">{brief.get('executive_summary', '')}</p>
         </div>
 
         {urgent_html}
         
         <div style="background:white;padding:24px;border-radius:12px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-            <h3 style="margin-top:0;">📅 Meetings ({meetings.get('count', 0)})</h3>
-            <ul>{"".join(f"<li>{n}</li>" for n in meetings.get('preparation_notes', []))}</ul>
+            <h3 style="margin-top:0;color:#1f2937;">Meetings ({meetings.get('count', 0)})</h3>
+            <ul style="color:#374151;">{"".join(f"<li>{n}</li>" for n in meetings.get('preparation_notes', []))}</ul>
         </div>
 
         <div style="background:white;padding:24px;border-radius:12px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-            <h3 style="margin-top:0;">🌤️ Weather</h3>
-            <p>{weather.get('summary', 'N/A')}</p>
-            <p style="color:#6b7280;"><em>{weather.get('outfit_suggestion', '')}</em></p>
+            <h3 style="margin-top:0;color:#1f2937;">Weather</h3>
+            <p style="color:#374151;">{weather.get('summary', 'N/A')}</p>
+            <p style="color:#6b7280;font-style:italic;">{weather.get('outfit_suggestion', '')}</p>
         </div>
 
         <div style="background:white;padding:24px;border-radius:12px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-            <h3 style="margin-top:0;">💡 Productivity Tips</h3>
-            <ul>{tips_html}</ul>
+            <h3 style="margin-top:0;color:#1f2937;">Productivity Tips</h3>
+            <ul style="color:#374151;">{tips_html}</ul>
         </div>
 
         <div style="background:#f0fdf4;padding:16px;border-radius:8px;text-align:center;margin-top:20px;">

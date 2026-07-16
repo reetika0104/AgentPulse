@@ -4,25 +4,24 @@
 
 @layer base {
   body {
-    @apply bg-[#0a0e1a] text-gray-100 antialiased;
+    @apply bg-[#09090b] text-gray-100 antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }
 
 @layer components {
   .card {
-    @apply bg-[#111827]/80 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 
-           shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-300;
+    @apply bg-[#18181b] border border-[#27272a] rounded-xl p-6 
+           transition-all duration-200;
   }
 
   .card-glass {
-    @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-6
-           shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:border-white/[0.12]
-           transition-all duration-300;
+    @apply bg-[#18181b] border border-[#27272a] rounded-xl p-6
+           hover:border-[#3f3f46] transition-all duration-200;
   }
 
   .card-glow {
-    @apply card hover:border-indigo-500/30 hover:shadow-[0_0_30px_rgba(99,102,241,0.1)];
+    @apply card hover:border-[#3f3f46];
   }
 
   .status-dot {
@@ -30,85 +29,36 @@
   }
 
   .status-dot-active {
-    @apply status-dot bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)] animate-pulse;
+    @apply status-dot bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.6)] animate-pulse;
   }
 
   .status-dot-error {
-    @apply status-dot bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.6)];
+    @apply status-dot bg-red-500;
   }
 
   .status-dot-warning {
-    @apply status-dot bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)];
+    @apply status-dot bg-amber-500;
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent;
-  }
-
-  .gradient-text-warm {
-    @apply bg-gradient-to-r from-orange-400 to-rose-400 bg-clip-text text-transparent;
+    @apply text-white font-bold;
   }
 
   .btn-primary {
-    @apply px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 
-           hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl 
-           font-medium transition-all duration-200 
-           shadow-[0_4px_20px_rgba(99,102,241,0.3)]
-           hover:shadow-[0_4px_25px_rgba(99,102,241,0.5)]
-           active:scale-[0.97];
+    @apply px-4 py-2.5 bg-white text-black rounded-lg 
+           font-medium transition-all duration-150 
+           hover:bg-gray-200 active:scale-[0.97];
   }
 
   .btn-secondary {
-    @apply px-4 py-2.5 bg-white/[0.05] hover:bg-white/[0.08] text-gray-300 rounded-xl 
-           font-medium transition-all duration-200 border border-white/[0.08]
-           hover:border-white/[0.15];
-  }
-
-  .metric-value {
-    @apply text-2xl font-bold tracking-tight;
+    @apply px-4 py-2.5 bg-transparent hover:bg-[#27272a] text-gray-400 rounded-lg 
+           font-medium transition-all duration-150 border border-[#27272a]
+           hover:border-[#3f3f46] hover:text-gray-200;
   }
 
   .section-title {
-    @apply text-xs font-semibold text-gray-500 uppercase tracking-[0.15em] mb-4;
+    @apply text-[11px] font-medium text-[#71717a] uppercase tracking-[0.1em] mb-4;
   }
-
-  .phase-badge {
-    @apply px-2.5 py-1 rounded-full text-xs font-medium border;
-  }
-
-  .phase-active {
-    @apply phase-badge bg-indigo-500/10 text-indigo-400 border-indigo-500/30
-           shadow-[0_0_12px_rgba(99,102,241,0.2)];
-  }
-
-  .phase-complete {
-    @apply phase-badge bg-emerald-500/10 text-emerald-400 border-emerald-500/30;
-  }
-
-  .phase-pending {
-    @apply phase-badge bg-gray-500/10 text-gray-500 border-gray-500/20;
-  }
-}
-
-/* Background gradient */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 100%, rgba(6, 182, 212, 0.05) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.03) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-#root {
-  position: relative;
-  z-index: 1;
 }
 
 /* Custom scrollbar */
@@ -121,41 +71,27 @@ body::before {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.08);
+  background: #27272a;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.15);
+  background: #3f3f46;
 }
 
 /* Animations */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-4px); }
-}
-
 .animate-fade-in-up {
-  animation: fadeInUp 0.5s ease-out forwards;
+  animation: fadeInUp 0.3s ease-out forwards;
 }
 
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-.stagger-1 { animation-delay: 0.1s; opacity: 0; }
-.stagger-2 { animation-delay: 0.2s; opacity: 0; }
-.stagger-3 { animation-delay: 0.3s; opacity: 0; }
-.stagger-4 { animation-delay: 0.4s; opacity: 0; }
-.stagger-5 { animation-delay: 0.5s; opacity: 0; }
-.stagger-6 { animation-delay: 0.6s; opacity: 0; }
+.stagger-1 { animation-delay: 0.05s; opacity: 0; }
+.stagger-2 { animation-delay: 0.1s; opacity: 0; }
+.stagger-3 { animation-delay: 0.15s; opacity: 0; }
+.stagger-4 { animation-delay: 0.2s; opacity: 0; }
+.stagger-5 { animation-delay: 0.25s; opacity: 0; }
+.stagger-6 { animation-delay: 0.3s; opacity: 0; }

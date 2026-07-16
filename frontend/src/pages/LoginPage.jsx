@@ -11,7 +11,6 @@ export default function LoginPage({ onLogin }) {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
       await api.login(username, password);
       onLogin();
@@ -26,21 +25,20 @@ export default function LoginPage({ onLogin }) {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-sm animate-fade-in-up">
         {/* Logo */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 mb-5 shadow-[0_0_60px_rgba(99,102,241,0.3)] animate-float">
-            <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white mb-4">
+            <svg className="w-6 h-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
-          <h1 className="text-3xl font-black gradient-text tracking-tight">PULSE</h1>
-          <p className="text-gray-500 mt-2 text-sm">Personal Unified Life & Productivity Executive</p>
-          <p className="text-[10px] text-gray-600 mt-1 uppercase tracking-widest">AI Digital Chief of Staff</p>
+          <h1 className="text-xl font-semibold text-white">PULSE</h1>
+          <p className="text-[#71717a] mt-1 text-sm">AI Digital Chief of Staff</p>
         </div>
 
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="card-glass space-y-5">
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="card-glass space-y-4">
           <div>
-            <label htmlFor="username" className="block text-xs font-medium text-gray-400 mb-2">
+            <label htmlFor="username" className="block text-xs font-medium text-[#a1a1aa] mb-1.5">
               Username
             </label>
             <input
@@ -48,17 +46,17 @@ export default function LoginPage({ onLogin }) {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl
-                         text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500/50
-                         focus:ring-1 focus:ring-indigo-500/30 transition-all text-sm"
-              placeholder="Enter username"
+              className="w-full px-3 py-2.5 bg-[#09090b] border border-[#27272a] rounded-lg
+                         text-white placeholder-[#52525b] focus:outline-none focus:border-[#52525b]
+                         transition-colors text-sm"
+              placeholder="admin"
               required
               autoComplete="username"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-xs font-medium text-gray-400 mb-2">
+            <label htmlFor="password" className="block text-xs font-medium text-[#a1a1aa] mb-1.5">
               Password
             </label>
             <input
@@ -66,50 +64,31 @@ export default function LoginPage({ onLogin }) {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl
-                         text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500/50
-                         focus:ring-1 focus:ring-indigo-500/30 transition-all text-sm"
-              placeholder="Enter password"
+              className="w-full px-3 py-2.5 bg-[#09090b] border border-[#27272a] rounded-lg
+                         text-white placeholder-[#52525b] focus:outline-none focus:border-[#52525b]
+                         transition-colors text-sm"
+              placeholder="••••••"
               required
               autoComplete="current-password"
             />
           </div>
 
           {error && (
-            <div className="p-3 bg-red-500/5 border border-red-500/20 rounded-xl text-red-400 text-xs text-center">
-              {error}
-            </div>
+            <p className="text-xs text-red-400 text-center">{error}</p>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full btn-primary py-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full btn-primary py-2.5 text-sm disabled:opacity-50"
           >
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Authenticating...
-              </span>
-            ) : (
-              'Sign In'
-            )}
+            {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
-        {/* Footer */}
-        <div className="mt-8 text-center space-y-2">
-          <p className="text-[10px] text-gray-600">
-            Powered by Amazon Bedrock • EventBridge • Lambda • CloudWatch
-          </p>
-          <div className="flex items-center justify-center gap-2">
-            <div className="status-dot-active" />
-            <span className="text-[10px] text-gray-500">Agent Active — Next run at 7:00 AM</span>
-          </div>
-        </div>
+        <p className="text-center text-[10px] text-[#3f3f46] mt-6">
+          Powered by Amazon Bedrock · AWS
+        </p>
       </div>
     </div>
   );
