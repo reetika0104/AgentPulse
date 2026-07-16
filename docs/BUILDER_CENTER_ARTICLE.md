@@ -113,7 +113,7 @@ The flow: EventBridge Scheduler fires daily, triggering a Lambda function. The L
 ## Link to Repository and Deployment
 
 - **GitHub Repository:** [https://github.com/reetika0104/AgentPulse](https://github.com/reetika0104/AgentPulse)
-- **Live Dashboard:** [https://d2p1umgv2ynihx.cloudfront.net](https://d2p1umgv2ynihx.cloudfront.net)
+- **Live Dashboard:** [https://d2p1umgv2ynihx.cloudfront.net](https://d2p1umgv2ynihx.cloudfront.net) (demo login: `admin` / `pulse2026`)
 - **Backend API:** [https://fvitseikim.us-east-1.awsapprunner.com/api/v1/health](https://fvitseikim.us-east-1.awsapprunner.com/api/v1/health)
 
 ---
