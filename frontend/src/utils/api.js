@@ -3,7 +3,11 @@
  * Handles authentication and API requests to the PULSE backend.
  */
 
-const API_BASE = '/api/v1';
+// In production, VITE_API_URL is baked in at build time to point at the
+// deployed backend (e.g. App Runner). In local dev, it falls back to the
+// relative path proxied by Vite's dev server (see vite.config.js).
+const API_ROOT = import.meta.env.VITE_API_URL || '';
+const API_BASE = `${API_ROOT}/api/v1`;
 
 class PulseAPI {
   constructor() {
