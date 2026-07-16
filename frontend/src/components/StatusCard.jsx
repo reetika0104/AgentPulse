@@ -3,13 +3,11 @@ import React from 'react';
 export default function StatusCard({ title, value, subtitle, icon, type }) {
   const getValueColor = () => {
     switch (type) {
-      case 'status':
-        return value === 'active' ? 'text-emerald-400' : 'text-red-400';
-      case 'execution':
-        return value === 'completed' ? 'text-emerald-400' :
-               value === 'failed' ? 'text-red-400' : 'text-[#a1a1aa]';
-      default:
-        return 'text-white';
+      case 'status': return value === 'active' ? 'text-emerald-400' : 'text-red-400';
+      case 'execution': return value === 'completed' ? 'text-emerald-400' : value === 'failed' ? 'text-red-400' : 'text-gray-300';
+      case 'schedule': return 'text-blue-400';
+      case 'model': return 'text-gray-200';
+      default: return 'text-white';
     }
   };
 
@@ -21,24 +19,16 @@ export default function StatusCard({ title, value, subtitle, icon, type }) {
 
   return (
     <div className="card-glass">
-      <div className="flex items-start justify-between">
-        <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-medium text-[#71717a] uppercase tracking-wide mb-2">
-            {title}
-          </p>
+      <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">{title}</p>
+      <div className="flex items-center justify-between">
+        <div>
           <div className="flex items-center gap-2">
-            {type === 'status' && value === 'active' && (
-              <span className="status-dot-active flex-shrink-0" />
-            )}
-            <p className={`text-sm font-semibold truncate ${getValueColor()}`}>
-              {getDisplayValue()}
-            </p>
+            {type === 'status' && value === 'active' && <span className="status-dot-active" />}
+            <p className={`text-sm font-bold ${getValueColor()}`}>{getDisplayValue()}</p>
           </div>
-          {subtitle && (
-            <p className="text-[11px] text-[#52525b] mt-1.5 truncate">{subtitle}</p>
-          )}
+          {subtitle && <p className="text-[10px] text-gray-600 mt-1">{subtitle}</p>}
         </div>
-        <span className="text-lg opacity-60 flex-shrink-0 ml-2">{icon}</span>
+        <span className="text-xl">{icon}</span>
       </div>
     </div>
   );
